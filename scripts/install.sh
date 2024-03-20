@@ -3,6 +3,10 @@ random() {
 	tr </dev/urandom -dc A-Za-z0-9 | head -c5
 	echo
 }
+random_ipv6() {
+    local ipv6="2401:c080:1400:63fd:$(random):$(random):$(random):$(random)"
+    echo "$ipv6"
+}
 
 array=(1 2 3 4 5 6 7 8 9 0 a b c d e f)
 gen64() {
@@ -41,7 +45,7 @@ users $(awk -F "/" 'BEGIN{ORS="";} {print $1 ":CL:" $2 " "}' ${WORKDATA})
 
 $(awk -F "/" '{print "auth strong\n" \
 "allow " $1 "\n" \
-"proxy -6 -n -a -p" $4 " -i" $3 " -e"$5"\n" \
+"proxy -6 -n -a -p" $4 " -i" $3 " -e" random_ipv6 "\n" \
 "flush\n"}' ${WORKDATA})
 EOF
 }
@@ -64,7 +68,7 @@ upload_proxy() {
 }
 gen_data() {
     seq $FIRST_PORT $LAST_PORT | while read port; do
-        echo "usr$(random)/pass$(random)/$IP4/$port/$(gen64 $IP6)"
+        echo "usr$(random)/pass$(random)/$IP4/$port/$(random_ipv6)"
     done
 }
 
